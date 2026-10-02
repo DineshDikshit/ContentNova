@@ -206,30 +206,32 @@ function OutputPage({ results, formData, onReset }) {
     setImgLoaded(false);
     setUseFallback(false);
 
-    try {
-      const response = await axios.post('/generate-image', {
-        brandName: formData?.brandName,
-        description: formData?.description,
-        targetAudience: formData?.targetAudience,
-        tone: formData?.tone,
-        platform: formData?.platform,
-        styleVariation: nextStyle,
-      });
-
-      if (response.data && response.data.success) {
-        setCurrentImageUrl(response.data.imageUrl);
-        setCurrentImagePrompt(response.data.imagePrompt);
-      } else {
-        setUseFallback(true);
-      }
-    } catch (err) {
-      console.error('Error in New Style generation:', err);
-      setUseFallback(true);
-    } finally {
-      setIsRegenerating(false);
+   try {
+  const response = await axios.post(
+    `${process.env.REACT_APP_API_URL}/generate-image`,
+    {
+      brandName: formData?.brandName,
+      description: formData?.description,
+      targetAudience: formData?.targetAudience,
+      tone: formData?.tone,
+      platform: formData?.platform,
+      styleVariation: nextStyle,
     }
-  };
+  );
 
+  if (response.data && response.data.success) {
+    setCurrentImageUrl(response.data.imageUrl);
+    setCurrentImagePrompt(response.data.imagePrompt);
+  } else {
+    setUseFallback(true);
+  }
+} catch (err) {
+  console.error('Error in New Style generation:', err);
+  setUseFallback(true);
+} finally {
+  setIsRegenerating(false);
+}
+  };
   // Part 4: Download Poster (handles both normal image and HTML/CSS fallback)
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -260,7 +262,10 @@ function OutputPage({ results, formData, onReset }) {
           blobUrl = URL.createObjectURL(blob);
         } catch {
           // If cross-origin fetch is blocked, download through backend proxy
-          const proxyRes = await fetch(`/proxy-image?url=${encodeURIComponent(currentImageUrl)}`);
+          //const proxyRes = await fetch(`/proxy-image?url=${encodeURIComponent(currentImageUrl)}`);
+          const proxyRes = await fetch(
+  `${process.env.REACT_APP_API_URL}/proxy-image?url=${encodeURIComponent(currentImageUrl)}`
+);
           const blob = await proxyRes.blob();
           blobUrl = URL.createObjectURL(blob);
         }

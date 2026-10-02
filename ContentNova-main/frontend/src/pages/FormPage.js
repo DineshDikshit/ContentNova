@@ -111,7 +111,11 @@ function FormPage({ onResults }) {
 
     try {
       setLoadingStep('✍️ Crafting platform captions & hashtags with AI...');
-      const response = await axios.post('/generate-content', formData);
+      //const response = await axios.post('/generate-content', formData);
+      const response = await axios.post(
+  `${process.env.REACT_APP_API_URL}/generate-content`,
+  formData
+);
 
       if (!response.data || !response.data.success) {
         throw new Error(response.data?.error || 'Failed to generate content. Please try again.');
